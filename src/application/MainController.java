@@ -1,6 +1,7 @@
 package application;
 
 import java.net.URL;
+import java.util.Comparator;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -28,7 +29,7 @@ public class MainController implements Initializable {
   private TableColumn<EmailMessage, String> senderCol;
 
   @FXML
-  private TableColumn<EmailMessage, Integer> sizeCol;
+  private TableColumn<EmailMessage, String> sizeCol;
 
   @FXML
   private TableView<EmailMessage> emailTableView;
@@ -50,9 +51,22 @@ public class MainController implements Initializable {
 
     subjectCol.setCellValueFactory(new PropertyValueFactory<EmailMessage, String>("subject"));
     senderCol.setCellValueFactory(new PropertyValueFactory<EmailMessage, String>("sender"));
-    sizeCol.setCellValueFactory(new PropertyValueFactory<EmailMessage, Integer>("size"));
+    sizeCol.setCellValueFactory(new PropertyValueFactory<EmailMessage, String>("size"));
     
     emailTableView.setItems(data);
+    
+    sizeCol.setComparator(new Comparator<String>() { 
+      Integer int1, int2;
+
+      @Override
+      public int compare(String o1, String o2) {
+        int1 = EmailMessage.formattedValues.get(o1);
+        int2 = EmailMessage.formattedValues.get(o2);
+        
+        return int1.compareTo(int2);
+      }
+      
+    });
   }
 
 }
