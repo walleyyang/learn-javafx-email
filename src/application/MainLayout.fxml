@@ -12,7 +12,7 @@
       <Button fx:id="Button1" alignment="TOP_LEFT" layoutX="32.0" layoutY="23.0" mnemonicParsing="false" text="Button" />
       <Button alignment="TOP_LEFT" layoutX="108.0" layoutY="23.0" mnemonicParsing="false" text="Button" />
       <Button alignment="TOP_LEFT" layoutX="183.0" layoutY="23.0" mnemonicParsing="false" text="Button" />
-      <TreeView layoutX="28.0" layoutY="76.0" prefHeight="511.0" prefWidth="200.0" AnchorPane.bottomAnchor="13.0" AnchorPane.leftAnchor="28.0" AnchorPane.topAnchor="76.0" />
+      <TreeView fx:id="emailFoldersTreeView" layoutX="28.0" layoutY="76.0" prefHeight="511.0" prefWidth="200.0" AnchorPane.bottomAnchor="13.0" AnchorPane.leftAnchor="28.0" AnchorPane.topAnchor="76.0" />
       <TableView fx:id="emailTableView" layoutX="228.0" layoutY="77.0" prefHeight="190.0" prefWidth="549.0">
         <columns>
           <TableColumn fx:id="subjectCol" prefWidth="253.0" text="Subject" />
