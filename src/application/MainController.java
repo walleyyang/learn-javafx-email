@@ -10,6 +10,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TreeItem;
@@ -29,7 +31,9 @@ public class MainController implements Initializable {
   
   @FXML
   private TreeView<String> emailFoldersTreeView;
-  private TreeItem<String> root = new TreeItem<String>();
+  private TreeItem<String> root = new TreeItem<>();
+  private SampleData sampleData = new SampleData();
+  private MenuItem showDetails = new MenuItem("show details");
 
   @FXML
   private TableColumn<EmailMessage, String> subjectCol;
@@ -48,21 +52,13 @@ public class MainController implements Initializable {
     System.out.println("button1 clicked");
   }
 
-  final ObservableList<EmailMessage> data = FXCollections.observableArrayList(
-      new EmailMessage("Congrats You Won!", "marketing@spamemail.com", 5540040),
-      new EmailMessage("Water Bill", "billing@fakewatercompany.com", 100),
-      new EmailMessage("Phone Bill", "billing@fakephonecompany.com", 99),
-      new EmailMessage("You Inherited $1 Million Dollars!", "phishing@spamemail.com", 125));
-
   @Override
   public void initialize(URL location, ResourceBundle resources) {
-    messageRenderer.getEngine().loadContent("<html>test test</html>");
+
 
     subjectCol.setCellValueFactory(new PropertyValueFactory<EmailMessage, String>("subject"));
     senderCol.setCellValueFactory(new PropertyValueFactory<EmailMessage, String>("sender"));
     sizeCol.setCellValueFactory(new PropertyValueFactory<EmailMessage, String>("size"));
-    
-    emailTableView.setItems(data);
     
     sizeCol.setComparator(new Comparator<String>() { 
       Integer int1, int2;
@@ -92,6 +88,19 @@ public class MainController implements Initializable {
     
     root.getChildren().addAll(Inbox, Sent, Spam, Trash);
     root.setExpanded(true);
+    
+    emailTableView.setContextMenu(new ContextMenu(showDetails));
+    
+    emailFoldersTreeView.setOnMouseClicked(e ->  {
+      TreeItem<String> item = emailFoldersTreeView.getSelectionModel().getSelectedItem();
+      if (item != null) {
+        emailTableView.setItems(sampleData.emailFolders.get(item.getValue()));
+      }
+    });
+    
+    showDetails.setOnAction(e -> {
+      System.out.println("clicked!");
+    });
   }
   
   private Node resolveIcon(String treeitemValue) {

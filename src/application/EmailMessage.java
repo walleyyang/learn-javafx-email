@@ -13,11 +13,13 @@ public class EmailMessage {
   private SimpleStringProperty sender;
   private SimpleStringProperty subject;
   private SimpleStringProperty size;
+  private String content;
 
-  public EmailMessage(String Subject, String Sender, int size) {
+  public EmailMessage(String Subject, String Sender, int size, String content) {
     this.subject = new SimpleStringProperty(Subject);
     this.sender = new SimpleStringProperty(Sender);
     this.size = new SimpleStringProperty(formatSize(size));
+    this.content = content;
   }
 
   public String getSender() {
@@ -30,6 +32,10 @@ public class EmailMessage {
 
   public String getSize() {
     return size.get();
+  }
+  
+  public String getContent() {
+    return content;
   }
   
   private String formatSize(int size) {
