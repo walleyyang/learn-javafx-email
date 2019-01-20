@@ -1,14 +1,12 @@
-package application;
+package controller;
 
 import java.net.URL;
 import java.util.Comparator;
 import java.util.ResourceBundle;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -17,9 +15,12 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.web.WebView;
+import javafx.stage.Stage;
+import model.EmailMessage;
+import model.SampleData;
+import model.Singleton;
+import view.ViewFactory;
 
 public class MainController implements Initializable {
 
@@ -34,6 +35,7 @@ public class MainController implements Initializable {
   private TreeItem<String> root = new TreeItem<>();
   private SampleData sampleData = new SampleData();
   private MenuItem showDetails = new MenuItem("show details");
+  private Singleton singleton;
 
   @FXML
   private TableColumn<EmailMessage, String> subjectCol;
@@ -54,8 +56,8 @@ public class MainController implements Initializable {
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
-
-
+    ViewFactory viewFactory = new ViewFactory();
+    singleton = Singleton.getInstance();
     subjectCol.setCellValueFactory(new PropertyValueFactory<EmailMessage, String>("subject"));
     senderCol.setCellValueFactory(new PropertyValueFactory<EmailMessage, String>("sender"));
     sizeCol.setCellValueFactory(new PropertyValueFactory<EmailMessage, String>("size"));
@@ -76,20 +78,28 @@ public class MainController implements Initializable {
     emailFoldersTreeView.setRoot(root);
     
     root.setValue("test@gmail.com");
-    root.setGraphic(resolveIcon(root.getValue()));
+    root.setGraphic(viewFactory.resolveIcon(root.getValue()));
     
-    TreeItem<String> Inbox = new TreeItem<String>("Inbox", resolveIcon("Inbox"));
-    TreeItem<String> Sent = new TreeItem<String>("Sent", resolveIcon("Sent"));
-      TreeItem<String> Subitem1 = new TreeItem<String>("Subitem1", resolveIcon("Subitem1"));
-      TreeItem<String> Subitem2 = new TreeItem<String>("Subitem2", resolveIcon("Subitem2"));
+    TreeItem<String> Inbox = new TreeItem<String>("Inbox", viewFactory.resolveIcon("Inbox"));
+    TreeItem<String> Sent = new TreeItem<String>("Sent", viewFactory.resolveIcon("Sent"));
+      TreeItem<String> Subitem1 = new TreeItem<String>("Subitem1", viewFactory.resolveIcon("Subitem1"));
+      TreeItem<String> Subitem2 = new TreeItem<String>("Subitem2", viewFactory.resolveIcon("Subitem2"));
       Sent.getChildren().addAll(Subitem1, Subitem2);
-    TreeItem<String> Spam = new TreeItem<String>("Spam", resolveIcon("Spam"));
-    TreeItem<String> Trash = new TreeItem<String>("Trash", resolveIcon("Trash"));
+    TreeItem<String> Spam = new TreeItem<String>("Spam", viewFactory.resolveIcon("Spam"));
+    TreeItem<String> Trash = new TreeItem<String>("Trash", viewFactory.resolveIcon("Trash"));
     
     root.getChildren().addAll(Inbox, Sent, Spam, Trash);
     root.setExpanded(true);
     
     emailTableView.setContextMenu(new ContextMenu(showDetails));
+    
+    emailTableView.setOnMouseClicked(e -> {
+      EmailMessage message = emailTableView.getSelectionModel().getSelectedItem();
+      if (message != null) {
+        messageRenderer.getEngine().loadContent(message.getContent());
+        singleton.setMessage(message);
+      }
+    });
     
     emailFoldersTreeView.setOnMouseClicked(e ->  {
       TreeItem<String> item = emailFoldersTreeView.getSelectionModel().getSelectedItem();
@@ -98,41 +108,15 @@ public class MainController implements Initializable {
       }
     });
     
-    showDetails.setOnAction(e -> {
-      System.out.println("clicked!");
+    showDetails.setOnAction(e -> {      
+      Scene scene = viewFactory.getEmailDetailScene();
+      Stage stage = new Stage();
+      stage.setScene(scene);
+      stage.show();
+      
     });
   }
   
-  private Node resolveIcon(String treeitemValue) {
-    String lowerCaseTreeItemValue = treeitemValue.toLowerCase();
-    ImageView returnIcon;
-    
-    try {
-      if (lowerCaseTreeItemValue.contains("inbox")) {
-        returnIcon = new ImageView(new Image(getClass().getResourceAsStream("images/inbox.png")));
-      }
-      else if (lowerCaseTreeItemValue.contains("sent")) {
-        returnIcon = new ImageView(new Image(getClass().getResourceAsStream("images/sent.png")));
-      }
-      else if (lowerCaseTreeItemValue.contains("spam")) {
-        returnIcon = new ImageView(new Image(getClass().getResourceAsStream("images/spam.png")));
-      }
-      else if (lowerCaseTreeItemValue.contains("@")) {
-        returnIcon = new ImageView(new Image(getClass().getResourceAsStream("images/email.png")));
-      }
-      else {
-        returnIcon = new ImageView(new Image(getClass().getResourceAsStream("images/folder.png")));
-      }
-    } catch (NullPointerException e) {
-      System.out.println("Invalid image location");
-      e.printStackTrace();
-      return new ImageView();
-    }
-    
-    returnIcon.setFitHeight(16);
-    returnIcon.setFitWidth(16);
-    
-    return returnIcon;
-  }
+
 
 }
